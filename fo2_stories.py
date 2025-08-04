@@ -27,23 +27,23 @@ def _start_to_render():
     try:
         cyberpi.screen.enable_autorender()
         if DEBUG:
-            print('autorender started...')
+            print('auto-render started...')
         sleep(0.05)
-    except Exception as err:
-        _handle_error(err, 'Start to Render')
+    except Exception as e:
+        _handle_error(e, 'Start to Render')
 
 
 def _stop_to_render():
     try:
         cyberpi.screen.disable_autorender()
         if DEBUG:
-            print('autorender stopped...')
+            print('auto-render stopped...')
         sleep(0.05)
-    except Exception as err:
+    except Exception as e:
         try:
-            cyberpi.console.print('ERROR: ' + str(err))
-        except Exception as err:
-            print(err)
+            cyberpi.console.print('ERROR: ' + str(e))
+        except Exception as e:
+            print(e)
 
 
 _stop_to_render()
@@ -126,13 +126,13 @@ def _debug_sprite_text(text):
     DEBUG_SPRITE.draw_text(text)
 
 
-def _show_botton_left_label(text, size=16, position='bottom_left'):
+def _show_button_left_label(text, size=16, position='bottom_left'):
     cyberpi.display.show_label(text, size, position)
 
 
 def print_free_mem():
     text = 'Free mem:\n' + str(gc.mem_free()) + ' bytes\n\n\n\n'
-    _show_botton_left_label(text)
+    _show_button_left_label(text)
     # cyberpi.console.println('Loading...')
     # cyberpi.console.println('Free mem:')
     # cyberpi.console.println(str(gc.mem_free()) + ' bytes')
@@ -187,6 +187,7 @@ def _load_file_binary_array(file):
             FILE_ACCESS_LOCK = False
             gc.collect()
             print_free_mem()
+    return None
 
 
 def preload_bin_arrays():
@@ -205,11 +206,11 @@ def _safe_screen_clear():
         if DEBUG:
             print('Console and display cleared...')
         sleep(0.05)
-    except Exception as err:
+    except Exception as e:
         try:
-            cyberpi.console.print('ERROR: ' + str(err))
-        except Exception as err:
-            print(err)
+            cyberpi.console.print('ERROR: ' + str(e))
+        except Exception as e:
+            print(e)
 
 
 def _handle_error(error, context='Unknown'):
@@ -219,8 +220,8 @@ def _handle_error(error, context='Unknown'):
     error_msg = 'ERROR [' + str(context) + ']: ' + str(error)
     try:
         cyberpi.console.print(error_msg)
-    except Exception as err:
-        print(err)
+    except Exception as e:
+        print(e)
     return error_msg
 
 
@@ -228,16 +229,16 @@ def _safe_play_audio(sound_name):
     try:
         cyberpi.audio.play(sound_name)
         sleep(0.05)
-    except Exception as err:
-        _handle_error(err, 'Play Audio')
+    except Exception as e:
+        _handle_error(e, 'Play Audio')
 
 
 def _render_me():
     try:
         cyberpi.screen.render()
         sleep(0.05)
-    except Exception as err:
-        _handle_error(err, 'Manual Render')
+    except Exception as e:
+        _handle_error(e, 'Manual Render')
 
 
 # ---------------------------------------------------------
@@ -250,10 +251,9 @@ class SpriteFactory:
 
     def create_sprites_from_bin_pixel_arrays(self, files, x=None, y=None):
         if isinstance(files, list):
-            array = None
             for file in files:
                 if file not in PIXEL_ARRAY_FILES_BIN:
-                    raise ValueError(file + ' is not among registred files')
+                    raise ValueError(file + ' is not among registered files')
                 else:
                     name = file.split('.')[0]
                     array = _load_file_binary_array(file)
@@ -278,10 +278,9 @@ class SpriteFactory:
     def create_sprites_from_cached_pixel_arrays(self, files, x=None, y=None):
         if isinstance(files, list):
             print('Loading from cache: ' + str(files))
-            array = None
             for file in files:
                 if file not in PIXEL_ARRAY_FILES_BIN:
-                    raise ValueError(str(file) + ' is not among registred files')
+                    raise ValueError(str(file) + ' is not among registered files')
                 else:
                     array = _load_cached_binary_array(file)
                     if array is not None:
@@ -305,9 +304,9 @@ class SpriteFactory:
                 print('Transparent array created')
             gc.collect()
             return array
-        except Exception as err:
+        except Exception as e:
             if DEBUG:
-                print('Transparent array creation error:', err)
+                print('Transparent array creation error:', e)
             return None
 
     def hide_all(self):
@@ -319,9 +318,9 @@ class SpriteFactory:
             if sprite is not None and hasattr(sprite, 'hide') and callable(sprite.hide):
                 try:
                     sprite.hide()
-                except Exception as err:
+                except Exception as e:
                     if DEBUG:
-                        print('Error hiding sprite', name + ':', str(err))
+                        print('Error hiding sprite', name + ':', str(e))
 
     def show_all(self):
         """Show all sprites attached as attributes."""
@@ -332,9 +331,9 @@ class SpriteFactory:
             if sprite is not None and hasattr(sprite, 'show') and callable(sprite.show):
                 try:
                     sprite.show()
-                except Exception as err:
+                except Exception as e:
                     if DEBUG:
-                        print('Error showing sprite', name + ':', str(err))
+                        print('Error showing sprite', name + ':', str(e))
 
     def move_all_to(self, x, y):
         """Move all sprites to a specific position."""
@@ -345,9 +344,9 @@ class SpriteFactory:
             if sprite is not None and hasattr(sprite, 'move_to') and callable(sprite.move_to):
                 try:
                     sprite.move_to(x, y)
-                except Exception as err:
+                except Exception as e:
                     if DEBUG:
-                        print('Error moving sprite', name + ':', str(err))
+                        print('Error moving sprite', name + ':', str(e))
 
     def clean_sprite_factory(self):
         """Clean up all sprites, attributes and free memory."""
@@ -400,7 +399,7 @@ class SkinFactory(SpriteFactory):  # self.skin
             print('Loading from cache: ' + str(files))
             for file in files:
                 if file not in PIXEL_ARRAY_FILES_BIN:
-                    raise ValueError(str(file) + ' is not among registred files')
+                    raise ValueError(str(file) + ' is not among registered files')
                 else:
                     array = _load_cached_binary_array(file)
                     if 'front_1' in file:
@@ -460,10 +459,12 @@ class SkinFactory(SpriteFactory):  # self.skin
         self.draw_skin_pixels(['adv_pa_ground_1.bin'], 72, 45)
         return True
 
-    def load_raider_armor_skin(self):
-        pass
+    @staticmethod
+    def load_raider_armor_skin():
+        return True
 
 
+# noinspection PyProtectedMember
 class VaultDweller:
     """Represents the virtual character with stats and behaviors."""
 
@@ -581,8 +582,8 @@ class VaultDweller:
                     self._is_soul_mirrored = False
             else:
                 raise ValueError('Invalid x_direction: ' + str(self.x_direction))
-        except Exception as err:
-            _handle_error(err, 'Set Dweller\'s Direction')
+        except Exception as e:
+            _handle_error(e, 'Set Dweller\'s Direction')
 
 
 class PipBoy:
@@ -685,7 +686,7 @@ class PipBoy:
             'Status:\n  Name:\n   Age: ' +
             '\n' + self.screen_delimiter + tooltip
         )
-        _show_botton_left_label(frame)
+        _show_button_left_label(frame)
         _safe_play_audio('prompt-tone')
         cyberpi.console.println(' ')
         cyberpi.console.println(' ')
@@ -703,7 +704,7 @@ class PipBoy:
             '\n Happy:' + '     %' + '\nEnergy:' + '     %' +
             '\n' + self.screen_delimiter + 'A:Back' + debug_status
         )
-        _show_botton_left_label(frame)
+        _show_button_left_label(frame)
         _safe_play_audio('prompt-tone')
         cyberpi.console.println(' ')
         cyberpi.console.println(' ' * 8 + str(self.dweller.health))
@@ -719,7 +720,7 @@ class PipBoy:
             '\n\n\n' +
             '\n' + self.screen_delimiter + 'A:Back B:Change'
         )
-        _show_botton_left_label(frame)
+        _show_button_left_label(frame)
         _safe_play_audio('prompt-tone')
         cyberpi.console.println(' ')
         cyberpi.console.println(self.dweller.current_skin_type)
@@ -734,7 +735,7 @@ class PipBoy:
             '\n\n\n' +
             '\n' + self.screen_delimiter + 'WAIT...'
         )
-        _show_botton_left_label(frame)
+        _show_button_left_label(frame)
         _safe_play_audio('prompt-tone')
         cyberpi.console.println(' ')
         cyberpi.console.println('Action is in progress...')
@@ -746,6 +747,7 @@ class FO2GameWorld:
     def __init__(self):
         self._is_initiated = False
         self._is_over = False
+        self.current_bg = None
         self.current_scene = None
         self.pip_boy = PipBoy()
         if DEBUG:
@@ -775,19 +777,19 @@ class FO2GameWorld:
         self.game_over_sprite.draw_text('GAME 0VER')
         self.game_over_sprite.set_color(250, 10, 10)
         self.game_over_sprite.set_scale(x_size=160, y_size=150)
-        self.curtains = cyberpi.sprite()
-        self.curtains.draw_pixel(SpriteFactory()._create_curtains_128x128_sprite_array(), 128, 128)
-        self.curtains.set_color(*COLORS['screen_green'])
-        self.gear = cyberpi.sprite()
-        self.gear.draw_pixel('gear')
-        self.gear.set_color(*COLORS['console_green'])
+        # self.curtains = cyberpi.sprite()
+        # self.curtains.draw_pixel(SpriteFactory()._create_curtains_128x128_sprite_array(), 128, 128)
+        # self.curtains.set_color(*COLORS['screen_green'])
+        # self.gear = cyberpi.sprite()
+        # self.gear.draw_pixel('gear')
+        # self.gear.set_color(*COLORS['console_green'])
         self._set_sprites_visibility()
         gc.collect()
 
     def _set_sprites_visibility(self):
         self.current_bg.z_min()
-        sprites_to_hide = [self.game_over_sprite, self.bg3_grave_top, self.bg3_coffin, self.gear]
-        sprites_to_show = [self.current_bg, self.curtains]
+        sprites_to_hide = [self.game_over_sprite, self.bg3_grave_top, self.bg3_coffin]
+        sprites_to_show = [self.current_bg]
         for sprite in sprites_to_hide:
             if sprite is not None:
                 sprite.hide()
@@ -798,13 +800,13 @@ class FO2GameWorld:
         if self.current_bg == self.backgrounds.background_3:
             self.bg3_grave_top.show()
             self.bg3_coffin.show()
-        self.curtains.z_max()
+        # self.curtains.z_max()
 
     def _start_world(self):
         self._setup_game_sprites()
         self.current_scene = 'world'
         _start_to_render()
-        self.curtains.hide()
+        # self.curtains.hide()
         if not self._is_initiated:
             self._is_initiated = True
         _safe_play_audio('buzzing')
@@ -816,7 +818,7 @@ class FO2GameWorld:
             self.current_scene = 'world'
             self._set_sprites_visibility()
             _start_to_render()
-            self.curtains.hide()
+            # self.curtains.hide()
 
     def show_fire(self):
         if not hasattr(self.fire_barrel, '_last_shown_frame'):
@@ -886,7 +888,7 @@ class FO2GameWorld:
         # hardcoding background_3 props for now:
         self.bg3_coffin.hide()
         self.bg3_grave_top.hide()
-        self.curtains.show()
+        # self.curtains.show()
 
     def open_pip_boy(self):
         if not self._is_over:
@@ -920,18 +922,20 @@ try:
     cyberpi.console.print('Loading...')
     preload_bin_arrays()
     game = FO2GameWorld()
+    # noinspection PyProtectedMember
     game._start_world()
 except Exception as err:
     try:
         _stop_to_render()
         cyberpi.console.print('ERROR: ' + str(err))
-    except Exception:
+    except Exception as err:
         print('ERROR: ' + str(err))
 
 
 # ---------------------------------------------------------
 # Event handlers
 # ---------------------------------------------------------
+# noinspection PyProtectedMember
 @cyberpi.event.start
 def main_game_loop():
     if DEBUG:
@@ -951,7 +955,7 @@ def main_game_loop():
                 gc.collect()
                 gc_counter = 0
         else:
-            # _show_botton_left_label(text='No game instance\n' + str(cyberpi.timer.get()), position='center')
+            # _show_button_left_label(text='No game instance\n' + str(cyberpi.timer.get()), position='center')
             pass
         sleep(0.05)
 
@@ -962,6 +966,7 @@ def display_pip_boy_wait():
         game.pip_boy.display_wait()  # temporarily
 
 
+# noinspection PyProtectedMember
 # @cyberpi.event.start
 @cyberpi.event.receive('play')
 def looped_animations_dweller():
@@ -981,6 +986,7 @@ def looped_animations_dweller():
     sleep(0.01)
 
 
+# noinspection PyProtectedMember
 # @cyberpi.event.start
 @cyberpi.event.receive('play')
 def looped_animation_fire():
@@ -994,6 +1000,7 @@ def looped_animation_fire():
     sleep(0.01)
 
 
+# noinspection PyProtectedMember
 # @cyberpi.event.start
 @cyberpi.event.receive('play')
 def looped_animation_game_over_gc():
@@ -1004,14 +1011,15 @@ def looped_animation_game_over_gc():
     if game:
         if game._is_initiated and game._is_over:
             game._clean_stage()
-            game.curtains.show()
-            game.curtains.z_max()
+            # game.curtains.show()
+            # game.curtains.z_max()
             game.game_over_sprite.show()
             game.game_over_sprite.z_max()
             _render_me()
     sleep(0.5)
 
 
+# noinspection PyProtectedMember
 @cyberpi.event.is_press('a')
 def on_press_a():
     global game
@@ -1039,6 +1047,7 @@ def on_press_a():
     sleep(0.01)
 
 
+# noinspection PyProtectedMember
 @cyberpi.event.is_press('b')
 def on_press_b():
     global game
@@ -1069,6 +1078,7 @@ def on_press_b():
     sleep(0.01)
 
 
+# noinspection PyProtectedMember
 @cyberpi.event.receive('toggle_awake')
 def adv_pa_toggle_awake():
     """Toggle between awake and asleep states."""
@@ -1081,6 +1091,7 @@ def adv_pa_toggle_awake():
     sleep(0.01)
 
 
+# noinspection PyProtectedMember
 @cyberpi.event.is_press('middle')
 def on_press_middle():
     global game
